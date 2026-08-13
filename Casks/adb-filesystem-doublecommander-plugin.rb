@@ -63,6 +63,31 @@ cask "adb-filesystem-doublecommander-plugin" do
     end
   end
 
+  # Deregisters the plugin from Double Commander's config on uninstall,
+  # same safety rules as postflight: only while Double Commander is closed.
+  uninstall_postflight do
+    require "fileutils"
+    config = File.join(Dir.home, "Library/Preferences/doublecmd/doublecmd.xml")
+    wfx = "#{HOMEBREW_PREFIX}/share/adb-filesystem-doublecommander-plugin/adbfsplugin.wfx"
+    if File.exist?(config) && File.read(config).include?(wfx)
+      if system("/usr/bin/pgrep", "-q", "-x", "doublecmd")
+        puts "Double Commander is running - its plugin registration was left in place."
+        puts "Remove it via Configuration -> Options... -> Plugins -> File System Plugins (WFX)."
+      else
+        content = File.read(config)
+        updated = content.sub(
+          %r{\s*<WfxPlugin[^>]*>\s*<Name>[^<]*</Name>\s*<Path>#{Regexp.escape(wfx)}</Path>\s*</WfxPlugin>},
+          "",
+        )
+        if updated != content
+          FileUtils.cp(config, "#{config}.bak")
+          File.write(config, updated)
+          puts "Removed the plugin registration from Double Commander (backup: doublecmd.xml.bak)."
+        end
+      end
+    end
+  end
+
   caveats <<~EOS
     The plugin registers itself in Double Commander automatically when
     possible (config present and Double Commander not running); restart
