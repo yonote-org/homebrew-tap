@@ -23,13 +23,70 @@ class AdbFilesystemDoublecommanderPlugin < Formula
     doc.install "README.md"
   end
 
+  # Registers the plugin in Double Commander's config. Runs unsandboxed after
+  # every install/upgrade; re-runnable any time with `brew postinstall`.
+  # DC rewrites its config on quit, so editing is only safe while it is closed.
+  def post_install
+    config = File.expand_path("~/Library/Preferences/doublecmd/doublecmd.xml")
+    wfx = opt_prefix/"adbfsplugin.wfx"
+
+    unless File.exist?(config)
+      ohai "Double Commander has no config yet. Start it once, quit it, then run:"
+      ohai "  brew postinstall #{name}"
+      return
+    end
+
+    content = File.read(config)
+    if content.include?(wfx.to_s)
+      ohai "Plugin already registered in Double Commander"
+      return
+    end
+
+    if quiet_system("/usr/bin/pgrep", "-q", "-x", "doublecmd")
+      opoo "Double Commander is running and would overwrite the change when it quits."
+      opoo "Quit Double Commander, then run: brew postinstall #{name}"
+      return
+    end
+
+    entry = <<~XML.strip
+      <WfxPlugin Enabled="True">
+              <Name>Android</Name>
+              <Path>#{wfx}</Path>
+            </WfxPlugin>
+    XML
+
+    updated =
+      if content.include?("adbfsplugin.wfx")
+        # an older registration exists - repoint it at this keg
+        content.sub(%r{<Path>[^<]*adbfsplugin\.wfx</Path>}, "<Path>#{wfx}</Path>")
+      elsif content.include?("</WfxPlugins>")
+        content.sub("</WfxPlugins>", "  #{entry}\n    </WfxPlugins>")
+      elsif content.include?("<WfxPlugins/>")
+        content.sub("<WfxPlugins/>", "<WfxPlugins>\n      #{entry}\n    </WfxPlugins>")
+      end
+
+    if updated.nil? || updated == content
+      opoo "Could not update #{config} - register the plugin manually (see caveats)"
+      return
+    end
+
+    FileUtils.cp config, "#{config}.bak"
+    File.write(config, updated)
+    ohai "Registered the plugin in Double Commander (backup: doublecmd.xml.bak)."
+    ohai "Restart Double Commander to load it."
+  end
+
   def caveats
     <<~EOS
-      Register the plugin in Double Commander:
-        Configuration -> Options... -> Plugins -> File System Plugins (WFX) -> Add
-      and select:
-        #{opt_prefix}/adbfsplugin.wfx
-      Then open the drive list (Alt+F1 / Alt+F2) and enter the Android entry.
+      The plugin registers itself in Double Commander automatically when
+      possible (config present and Double Commander not running); restart
+      Double Commander afterwards and enter the Android entry in the drive
+      list (Alt+F1 / Alt+F2). If registration was skipped, quit Double
+      Commander and run:
+        brew postinstall #{name}
+      Manual alternative in Double Commander:
+        Configuration -> Options... -> Plugins -> File System Plugins (WFX)
+        -> Add -> #{opt_prefix}/adbfsplugin.wfx
     EOS
   end
 
