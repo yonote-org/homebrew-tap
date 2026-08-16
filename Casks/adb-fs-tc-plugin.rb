@@ -31,6 +31,13 @@ cask "adb-fs-tc-plugin" do
     dc_running = proc { system("/usr/bin/pgrep", "-q", "-x", "doublecmd") }
     config = File.join(Dir.home, "Library/Preferences/doublecmd/doublecmd.xml")
     wfx = "#{HOMEBREW_PREFIX}/share/adb-fs-tc-plugin/adb-fs-tc-plugin.wfx"
+    # Homebrew quarantines cask artifacts by default, and the plugin is only
+    # ad-hoc signed - Gatekeeper would block Double Commander's dlopen of a
+    # quarantined .wfx ("blocked to protect your Mac"). It is our own
+    # artifact: strip the attribute. -d fails harmlessly when it is already
+    # absent (e.g. installs with --no-quarantine).
+    system("/usr/bin/xattr", "-d", "com.apple.quarantine", wfx,
+           err: File::NULL)
     # matches this cask's older names too, so upgrades repoint cleanly
     any_wfx = %r{<Path>[^<]*(?:adbfsplugin|adb-fs-tc-plugin)\.wfx</Path>}
     if !File.exist?(config)
