@@ -11,10 +11,13 @@ brew install --cask yonote-org/tap/adb-fs-tc-plugin
 Install **registers** the plugin in Double Commander's config
 (`~/Library/Preferences/doublecmd/doublecmd.xml`) and
 `brew uninstall --cask` **deregisters** it again — both automatically, with a
-`doublecmd.xml.bak` backup written before any change. Registration is only
-edited while Double Commander is closed (it overwrites its config on quit);
-if it was running, or had never been started, quit it and run
-`brew reinstall --cask adb-fs-tc-plugin`
-(or remove the entry by hand after an uninstall: **Configuration →
-Options… → Plugins → File System Plugins (WFX)**). Only the entry pointing
-at this cask's own `adbfsplugin.wfx` is ever touched.
+`doublecmd.xml.bak` backup written before any change. If Double Commander is
+running, it is asked to quit gracefully (macOS may show a one-time
+permission prompt for controlling it) and relaunched after the change —
+Double Commander only reads its config at startup and overwrites it on quit,
+so edits must happen while it is closed. If it refuses to quit (e.g. an
+unsaved editor prompt) or had never been started, the change is skipped —
+run `brew reinstall --cask adb-fs-tc-plugin` to retry (or remove the entry
+by hand after an uninstall: **Configuration → Options… → Plugins → File
+System Plugins (WFX)**). Only the entry pointing at this cask's own
+`adb-fs-tc-plugin.wfx` is ever touched.
