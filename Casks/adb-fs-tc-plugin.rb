@@ -1,9 +1,9 @@
 cask "adb-fs-tc-plugin" do
   arch arm: "arm64", intel: "x86_64"
 
-  version "1.0.7"
-  sha256 arm:   "80105401f59daa9c637df33ee9743ab5d96800adf628fb16b7fd1f83043c6ee0",
-         intel: "b6f8aec8d7bf4782197361639e4b8dc10aedbb47d2ff84098ebea285e9900241"
+  version "1.1.0"
+  sha256 arm:   "6fcef0cf25332df48f030a0c39b73ff8b34f5f4596d53029168a4483e1389486",
+         intel: "c3ac5267e1cc337926cb993d56e34e875166c5fe6aa1523bd46adca04c9d3667"
 
   url "https://github.com/yonote-org/adb-fs-tc-plugin/releases/download/v#{version}/adb-fs-tc-plugin-#{version}-macos-#{arch}.zip"
   name "ADB Filesystem DoubleCommander plugin"
