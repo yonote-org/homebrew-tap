@@ -1,11 +1,11 @@
 cask "adb-fs-tc-plugin" do
   arch arm: "arm64", intel: "x86_64"
 
-  version "1.0.5"
-  sha256 arm:   "eb80f19caa867653e9dfcdc74ac74ed9f2d357628d4b008ac55e64b0e9974bb9",
-         intel: "e2b677b398ae91478b1de370c748090fccc5a4a0cc21f4e4592555aec9d23ae2"
+  version "1.0.6"
+  sha256 arm:   "5cb902c8c30a5ad150ebfb20f32638882a94e2c3b1ccfe1b0bc279fc16c8d0a0",
+         intel: "df8eddf355cb2be8bcd97ff9ca09aaecafb272b21c4402f00e2464f75b70fb39"
 
-  url "https://github.com/yonote-org/adb-fs-tc-plugin/releases/download/v#{version}/adbfsplugin-#{version}-macos-#{arch}.zip"
+  url "https://github.com/yonote-org/adb-fs-tc-plugin/releases/download/v#{version}/adb-fs-tc-plugin-#{version}-macos-#{arch}.zip"
   name "ADB Filesystem DoubleCommander plugin"
   desc "ADB filesystem (WFX) plugin for Double Commander"
   homepage "https://github.com/yonote-org/adb-fs-tc-plugin"
@@ -15,8 +15,8 @@ cask "adb-fs-tc-plugin" do
     strategy :github_latest
   end
 
-  artifact "adbfsplugin.wfx",
-           target: "#{HOMEBREW_PREFIX}/share/adb-fs-tc-plugin/adbfsplugin.wfx"
+  artifact "adb-fs-tc-plugin.wfx",
+           target: "#{HOMEBREW_PREFIX}/share/adb-fs-tc-plugin/adb-fs-tc-plugin.wfx"
   artifact "LICENCE",
            target: "#{HOMEBREW_PREFIX}/share/adb-fs-tc-plugin/LICENCE"
 
@@ -26,7 +26,9 @@ cask "adb-fs-tc-plugin" do
   postflight do
     require "fileutils"
     config = File.join(Dir.home, "Library/Preferences/doublecmd/doublecmd.xml")
-    wfx = "#{HOMEBREW_PREFIX}/share/adb-fs-tc-plugin/adbfsplugin.wfx"
+    wfx = "#{HOMEBREW_PREFIX}/share/adb-fs-tc-plugin/adb-fs-tc-plugin.wfx"
+    # matches this cask's older names too, so upgrades repoint cleanly
+    any_wfx = %r{<Path>[^<]*(?:adbfsplugin|adb-fs-tc-plugin)\.wfx</Path>}
     if !File.exist?(config)
       puts "Double Commander has no config yet. Start it once, quit it, then run:"
       puts "  brew reinstall --cask adb-fs-tc-plugin"
@@ -43,9 +45,9 @@ cask "adb-fs-tc-plugin" do
                 "        <Path>#{wfx}</Path>\n" \
                 "      </WfxPlugin>"
         updated =
-          if content.include?("adbfsplugin.wfx")
+          if content =~ any_wfx
             # an older registration exists - repoint it at this install
-            content.sub(%r{<Path>[^<]*adbfsplugin\.wfx</Path>}, "<Path>#{wfx}</Path>")
+            content.sub(any_wfx, "<Path>#{wfx}</Path>")
           elsif content.include?("</WfxPlugins>")
             content.sub("</WfxPlugins>", "  #{entry}\n    </WfxPlugins>")
           elsif content.include?("<WfxPlugins/>")
@@ -68,7 +70,7 @@ cask "adb-fs-tc-plugin" do
   uninstall_postflight do
     require "fileutils"
     config = File.join(Dir.home, "Library/Preferences/doublecmd/doublecmd.xml")
-    wfx = "#{HOMEBREW_PREFIX}/share/adb-fs-tc-plugin/adbfsplugin.wfx"
+    wfx = "#{HOMEBREW_PREFIX}/share/adb-fs-tc-plugin/adb-fs-tc-plugin.wfx"
     if File.exist?(config) && File.read(config).include?(wfx)
       if system("/usr/bin/pgrep", "-q", "-x", "doublecmd")
         puts "Double Commander is running - its plugin registration was left in place."
@@ -97,6 +99,6 @@ cask "adb-fs-tc-plugin" do
       brew reinstall --cask adb-fs-tc-plugin
     Manual alternative in Double Commander:
       Configuration -> Options... -> Plugins -> File System Plugins (WFX)
-      -> Add -> #{HOMEBREW_PREFIX}/share/adb-fs-tc-plugin/adbfsplugin.wfx
+      -> Add -> #{HOMEBREW_PREFIX}/share/adb-fs-tc-plugin/adb-fs-tc-plugin.wfx
   EOS
 end
