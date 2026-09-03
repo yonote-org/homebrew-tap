@@ -2,8 +2,8 @@ class ZshAddons < Formula
   desc "Modular zsh addons: git-aware prompt, history search, Homebrew helpers"
   homepage "https://github.com/yonote-org/.zsh"
   url "https://github.com/yonote-org/.zsh.git",
-      tag:      "v1.3.0",
-      revision: "85aa8293a29bb286bfa982a8664068315f5cab37"
+      tag:      "v1.3.1",
+      revision: "9aa2b8db6e091442b81bc704c2991fb5ecc3d928"
   license "MIT"
   head "https://github.com/yonote-org/.zsh.git", branch: "main"
 
