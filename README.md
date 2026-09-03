@@ -1,12 +1,52 @@
 # yonote-org Homebrew tap
 
 ```sh
-brew install --cask yonote-org/tap/adb-fs-tc-plugin
+brew tap yonote-org/tap
 ```
+
+| Formula | Description |
+|---|---|
+| [`zsh-addons`](Formula/zsh-addons.rb) | [Zsh configuration addons](https://github.com/yonote-org/.zsh): git-aware prompt, history search widgets, colour-preserving `less`, and Homebrew helpers (`brew-new`, cask autoupdate management) |
 
 | Cask | Description |
 |---|---|
 | [`adb-fs-tc-plugin`](Casks/adb-fs-tc-plugin.rb) | [ADB filesystem (WFX) plugin](https://github.com/yonote-org/adb-fs-tc-plugin) for Double Commander on macOS — registers itself in Double Commander automatically |
+
+## zsh-addons
+
+```sh
+brew install yonote-org/tap/zsh-addons
+```
+
+installs the modules under `$(brew --prefix)/share/zsh-addons`, together with
+the two tools they rely on: `expect` (`unbuffer`, for `uless.zsh`) and `jq`
+(for `brew-new`'s online engine). Then add the line that `brew install`
+prints to `~/.zshrc`:
+
+```sh
+[[ -f "$(brew --prefix)/share/zsh-addons/configs.zsh" ]] && source "$(brew --prefix)/share/zsh-addons/configs.zsh"
+```
+
+Individual modules can be sourced instead of `configs.zsh`. Personal
+overrides go in `~/.zsh/local-user-config.zsh`, which `configs.zsh` sources
+last if it exists — it lives outside Homebrew's prefix, so upgrades never
+touch it. The [repo README](https://github.com/yonote-org/.zsh#readme)
+describes each module.
+
+To uninstall:
+
+```sh
+brew uninstall zsh-addons
+```
+
+and remove the `source` line from `~/.zshrc` — the `[[ -f ... ]]` guard keeps
+the shell quiet until you do.
+
+## adb-fs-tc-plugin
+
+```sh
+brew install --cask yonote-org/tap/adb-fs-tc-plugin
+```
 
 Install **registers** the plugin in Double Commander's config
 (`~/Library/Preferences/doublecmd/doublecmd.xml`) and
