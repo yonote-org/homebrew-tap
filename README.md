@@ -16,31 +16,37 @@ brew tap yonote-org/tap
 
 ```sh
 brew install yonote-org/tap/zsh-addons
+zsh-addons-setup
 ```
 
-installs the modules under `$(brew --prefix)/share/zsh-addons`, together with
-the two tools they rely on: `expect` (`unbuffer`, for `uless.zsh`) and `jq`
-(for `brew-new`'s online engine). Then add the line that `brew install`
-prints to `~/.zshrc`:
+`brew install` puts the modules under `$(brew --prefix)/share/zsh-addons`,
+together with the two tools they rely on: `expect` (`unbuffer`, for
+`uless.zsh`) and `jq` (for `brew-new`'s online engine). `zsh-addons-setup`
+then adds the one line that loads them to `~/.zshrc` (honours `ZDOTDIR`; safe
+to re-run):
 
 ```sh
-[[ -f "$(brew --prefix)/share/zsh-addons/configs.zsh" ]] && source "$(brew --prefix)/share/zsh-addons/configs.zsh"
+[[ -f "/opt/homebrew/share/zsh-addons/configs.zsh" ]] && source "/opt/homebrew/share/zsh-addons/configs.zsh"  # zsh-addons
 ```
 
-Individual modules can be sourced instead of `configs.zsh`. Personal
+Homebrew formulae cannot edit `~/.zshrc` themselves (they install inside a
+write sandbox and have no uninstall hook), which is why this is a command you
+run rather than something `brew install` does — add the line by hand if you
+prefer. Individual modules can be sourced instead of `configs.zsh`. Personal
 overrides go in `~/.zsh/local-user-config.zsh`, which `configs.zsh` sources
 last if it exists — it lives outside Homebrew's prefix, so upgrades never
 touch it. The [repo README](https://github.com/yonote-org/.zsh#readme)
 describes each module.
 
-To uninstall:
+To uninstall, take the line out first, then remove the formula:
 
 ```sh
+zsh-addons-setup --remove
 brew uninstall zsh-addons
 ```
 
-and remove the `source` line from `~/.zshrc` — the `[[ -f ... ]]` guard keeps
-the shell quiet until you do.
+(If you uninstall first, the `[[ -f ... ]]` guard keeps the shell quiet until
+you delete the line by hand.)
 
 ## adb-fs-tc-plugin
 

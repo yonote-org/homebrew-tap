@@ -2,8 +2,8 @@ class ZshAddons < Formula
   desc "Modular zsh addons: git-aware prompt, history search, Homebrew helpers"
   homepage "https://github.com/yonote-org/.zsh"
   url "https://github.com/yonote-org/.zsh.git",
-      tag:      "v1.0.0",
-      revision: "bec81c8f991f611486fc4aa4e6a363949b84e2e5"
+      tag:      "v1.1.0",
+      revision: "f1539b7a1b8c79ccdebcae83cea89866c152d2a6"
   license "MIT"
   head "https://github.com/yonote-org/.zsh.git", branch: "main"
 
@@ -14,22 +14,39 @@ class ZshAddons < Formula
   def install
     pkgshare.install Dir["*.zsh"]
     doc.install "README.md"
+
+    # Point the setup command at the installed configs.zsh. HOMEBREW_PREFIX/share
+    # rather than the Cellar path, so the ~/.zshrc line survives upgrades.
+    inreplace "zsh-addons-setup", /^configs_default=.*$/,
+              "configs_default=\"#{HOMEBREW_PREFIX}/share/zsh-addons/configs.zsh\""
+    bin.install "zsh-addons-setup"
   end
 
   def caveats
     <<~EOS
-      Add this line to ~/.zshrc to load all the addons:
+      Run `zsh-addons-setup` to add the line that loads the addons to ~/.zshrc
+      (honours ZDOTDIR, safe to re-run). Before `brew uninstall zsh-addons`,
+      run `zsh-addons-setup --remove` to take that line out again.
 
-        [[ -f #{opt_pkgshare}/configs.zsh ]] && source #{opt_pkgshare}/configs.zsh
+      Or add it yourself:
+        [[ -f #{HOMEBREW_PREFIX}/share/zsh-addons/configs.zsh ]] && source #{HOMEBREW_PREFIX}/share/zsh-addons/configs.zsh
 
-      Or source individual modules from that directory. Personal overrides go in
-      ~/.zsh/local-user-config.zsh, which configs.zsh sources last if it exists.
-      The [[ -f ]] guard keeps the shell quiet after `brew uninstall zsh-addons`;
-      remove the line to finish uninstalling.
+      Individual modules can be sourced from that directory instead. Personal
+      overrides go in ~/.zsh/local-user-config.zsh, which configs.zsh sources
+      last if it exists.
     EOS
   end
 
   test do
+    ENV["ZDOTDIR"] = testpath.to_s
+    rc = testpath/".zshrc"
+    system bin/"zsh-addons-setup"
+    assert_match "source \"#{HOMEBREW_PREFIX}/share/zsh-addons/configs.zsh\"", rc.read
+    system bin/"zsh-addons-setup"
+    assert_equal 1, rc.read.lines.count
+    system bin/"zsh-addons-setup", "--remove"
+    refute_match "configs.zsh", rc.read
+
     functions = %w[brew_new brewuy brew_autoupdate_check confirm members cd_git_root]
     output = shell_output(
       "zsh -f -c 'source #{pkgshare}/configs.zsh && whence -w bn #{functions.join(" ")}'",
