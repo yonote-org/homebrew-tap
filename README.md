@@ -19,9 +19,11 @@ brew install yonote-org/tap/zsh-addons
 zsh-addons-setup
 ```
 
-`brew install` puts the modules under `$(brew --prefix)/share/zsh-addons`,
-together with the two tools they rely on: `expect` (`unbuffer`, for
-`uless.zsh`) and `jq` (for `brew-new`'s online engine). `zsh-addons-setup`
+`brew install` puts the modules under `$(brew --prefix)/share/zsh-addons`
+and, as declared dependencies, the two tools they rely on: `expect`
+(`unbuffer`, for `uless.zsh`) and `jq` (for `brew-autoupdate` and `brew-new`'s
+online fallback) — `brew uninstall` removes them again unless you had
+installed them yourself. `zsh-addons-setup`
 then adds the one line that loads them to `~/.zshrc` (honours `ZDOTDIR`; safe
 to re-run):
 

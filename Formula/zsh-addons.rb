@@ -2,13 +2,13 @@ class ZshAddons < Formula
   desc "Modular zsh addons: git-aware prompt, history search, Homebrew helpers"
   homepage "https://github.com/yonote-org/.zsh"
   url "https://github.com/yonote-org/.zsh.git",
-      tag:      "v1.1.0",
-      revision: "f1539b7a1b8c79ccdebcae83cea89866c152d2a6"
+      tag:      "v1.2.0",
+      revision: "73aeb6b3c04c7b26fc9378b95e92f431d75be14f"
   license "MIT"
   head "https://github.com/yonote-org/.zsh.git", branch: "main"
 
   depends_on "expect" # unbuffer, used by uless.zsh
-  depends_on "jq" # brew-new's online engine
+  depends_on "jq" # brew-autoupdate, brew-new's online fallback
   uses_from_macos "zsh"
 
   def install
