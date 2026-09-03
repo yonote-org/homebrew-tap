@@ -20,10 +20,10 @@ zsh-addons-setup
 ```
 
 `brew install` puts the modules under `$(brew --prefix)/share/zsh-addons`
-and, as declared dependencies, the two tools they rely on: `expect`
-(`unbuffer`, for `uless.zsh`) and `jq` (for `brew-autoupdate` and `brew-new`'s
-online fallback) — `brew uninstall` removes them again unless you had
-installed them yourself. `zsh-addons-setup`
+and, as declared dependencies, the tools they rely on: `git`, `expect`
+(`unbuffer`, for `uless.zsh`) and `jq` (for `brew-autoupdate`) —
+`brew uninstall` removes them again unless you had installed them yourself.
+`zsh-addons-setup`
 then adds the one line that loads them to `~/.zshrc` (honours `ZDOTDIR`; safe
 to re-run):
 
